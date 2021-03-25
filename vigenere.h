@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <future>
 #include "quadgram_analysis.h"
 
 using namespace std;
@@ -147,8 +149,8 @@ string decrypting (string ciphertext, string key) {
 	return plaintext;
 }
 
-//Cryptanalysis Functions Below
-double scoring_via_quadgram(string text,int len){
+
+double scoring_via_quadgram(const string text, const int len){
    int i;
     char temp[4];
     double score = 0;
@@ -162,7 +164,7 @@ double scoring_via_quadgram(string text,int len){
     }
     return score;
 }
-string truncate_key (string key, int key_len) {
+string truncate_key (const string key, const int key_len) {
 	string truncate_final_key = "";
 	for (int i = 0; i< key_len; ++i) {
 			truncate_final_key = truncate_final_key + key [i];
@@ -170,37 +172,6 @@ string truncate_key (string key, int key_len) {
 	return truncate_final_key;
 }
 
-string decryption_key_attempt (string ciphertext, int loc, string key){
-	
-	string plaintext = "", final_key = "", temp_key = "0", truncate_final_key = "", key_copy = key, return_key = "";
-	double decryption_score {min_quadgram_score}, temp_score {min_quadgram_score};
-	int ciphertext_length = ciphertext.length();	
-	for (int i = 0; i < 26; ++i) {
-			
-		//Key Update
-		key[loc] =  int_to_char[i];
-		key = key_update(key, ciphertext.length());	
-			
-		plaintext = decrypting (ciphertext, key);	
-		temp_score = scoring_via_quadgram (plaintext, plaintext.length());
-		if (temp_score > decryption_score) {
-			return_key = key;
-			//cout << " Score: " << temp_score << " Plaintext: " << plaintext << " Potential Key: " << return_key << endl;
-			decryption_score = temp_score;
-		}
-		final_key = key;
-		final_key = truncate_key (key, key_copy.length());
-		key = final_key;
-		truncate_final_key = "";						
-						
-	}
-
-	return_key = truncate_key (return_key, key_copy.length());
-	
-	return return_key;
-}
-
-//Cryptanalysis function above
 
 class VigenereText {
 public:
@@ -214,6 +185,8 @@ public:
 	void read_encrypted() {cin >> encrypted; decrypted=encrypted; length=encrypted.length();}
 	void encrypt(string k) {key=k; encrypted = encrypting(decrypted, key);}
 	void encrypt() {cin >> key; encrypted = encrypting(decrypted, key);}
+	void decrypt(string k) {key=k; decrypted = decrypting(encrypted,key);}
+	void decrypt() {decrypted = decrypting(encrypted,key);}
 	void quadgram_score(size_t l) {score = scoring_via_quadgram(decrypted,l);}
 	void quadgram_score() {score = scoring_via_quadgram(decrypted,length);}
 	void print_status() {
@@ -223,4 +196,24 @@ public:
 };
 
 
+double decryption_key_attempt_score (const VigenereText &ciphertext, const int loc, const int i){
+	string key_copy {ciphertext.key};
+	key_copy[loc] =  int_to_char[i];
+	key_copy = key_update(key_copy, ciphertext.length);
+	return scoring_via_quadgram (decrypting (ciphertext.encrypted, key_copy), ciphertext.length);
+}
 
+
+string decryption_key_attempt (VigenereText &ciphertext, const int loc){
+
+	double decryption_score_list[26];
+	for (int i = 0; i < 26; ++i) {
+		std::future<double> score = std::async(decryption_key_attempt_score, ciphertext, loc, i);
+		decryption_score_list[i] = score.get();
+	}
+	
+	int best_score_index = std::max_element(std::begin(decryption_score_list), std::end(decryption_score_list)) - std::begin(decryption_score_list);
+	string return_key {ciphertext.key};
+	return_key[loc] =  int_to_char[best_score_index];
+	return return_key;
+}
