@@ -23,7 +23,7 @@ int main()
     cout << "Please enter the key: ";
     input.encrypt();
     //Display Ciphertext Results
-	std::cout << "-----------------------------------\nCiphertext: " << input.encrypted << '\n';
+	cout << "-----------------------------------\nCiphertext: " << input.encrypted << '\n';
 	
     return 0;
 }
