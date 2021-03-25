@@ -10,14 +10,6 @@ extern float qgram[];
 constexpr char int_to_char [26] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 constexpr double min_quadgram_score {-10000000000};
 
-void delay(){
-
-    //Add Delay
-    for(int i=0;i<10000;++i){
-        cout << "\r[+] Processing Request";
-    }
-
-}
 
 string key_update (string key_for_enc_n_dec, int plaintext_length){
     string temp = "";
@@ -82,7 +74,7 @@ string encrypting (string plaintext, string key) {
     //Converting Key to cover plaintext
     if((key_length<message_length) || (key_length > message_length)) {
         //cout << "Key Length Cannot be Used" << endl;
-        //delay();
+        
         //cout << endl;
         //Key Repetition
         key = key_update(key, message_length);
@@ -124,7 +116,7 @@ string decrypting (string ciphertext, string key) {
 	//Converting Key to cover ciphertext
     if((key_length<message_length) || (key_length > message_length)) {
         //cout << "Key Length Cannot be Used" << endl;
-        //delay();
+        
         //Key Repetition
         key = key_update(key, message_length);
         //cout << "The Updated key: " << key << endl;

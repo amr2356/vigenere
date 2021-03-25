@@ -16,11 +16,11 @@
 int main()
 {
 	VigenereText input;
-    std::cout << "-------------------------Vigenere cipher-------------------------\n";
-    std::cout << "Please enter your plaintext: ";
+    cout << "-------------------------Vigenere cipher-------------------------\n";
+    cout << "Please enter your plaintext: ";
     input.read_decrypted();
     //Input the Key and Encrypt
-    std::cout << "Please enter the key: ";
+    cout << "Please enter the key: ";
     input.encrypt();
     //Display Ciphertext Results
 	std::cout << "-----------------------------------\nCiphertext: " << input.encrypted << '\n';
