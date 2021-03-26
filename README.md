@@ -1,3 +1,7 @@
+# Contributors
+
+Swapnil Paliwal and Arun Ram Mohan
+
 # Vigenère cryptanalysis
 
 
