@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <future>
-#include "qgr.h"
+#include "quadgram_analysis.h"
 
 
 using namespace std;
