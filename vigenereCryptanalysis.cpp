@@ -71,8 +71,7 @@ void vigenere_analysis(VigenereText &ciphertext) {
 		//Guessing Keys character by character
 
 		for (auto i = 0; i < key_length; ++i) {
-			ciphertext.key = decryption_key_attempt (ciphertext.encrypted,i,ciphertext.key);
-			ciphertext.decrypted = decrypting (ciphertext.encrypted,ciphertext.key);
+			ciphertext.decrypt(decryption_key_attempt (ciphertext,i));
 			ciphertext.quadgram_score();
 			if ((highest_score < ciphertext.score) && (ciphertext.score > (1.15*compare.score))){
 				ciphertext.print_status();
