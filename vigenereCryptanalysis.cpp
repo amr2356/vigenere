@@ -1,6 +1,7 @@
 //Free to use and distribute
 #include <iostream>
 #include <string>
+#include <chrono>
 #include "vigenere.h"
 
 // KEY1: STRINGLENGTHOFTHIRTYCHARACTERS
@@ -62,6 +63,7 @@ void vigenere_analysis(VigenereText &ciphertext) {
 	
 	size_t best_key_length {ciphertext.length};
 	double highest_score {min_quadgram_score};
+	auto start = chrono::steady_clock::now();
 	for (int key_length = 2; key_length < ciphertext.length; ++key_length) {
 		
 		//Try not to repeat keys
@@ -78,8 +80,11 @@ void vigenere_analysis(VigenereText &ciphertext) {
 				best_key_length = key_length;
 			}
 		}
+		
 		ciphertext.key = ciphertext.key + int_to_char [0];
 	}
+	auto end = chrono::steady_clock::now();
+	cout << "Elapsed cryptanalysis time : "<< chrono::duration_cast<chrono::seconds>(end - start).count()<< " s";
 }
 
 int main() {
@@ -87,6 +92,7 @@ int main() {
 	VigenereText ciphertext;
 	cout << "Ciphertext: ";
 	ciphertext.read_encrypted();
+	
 	vigenere_analysis(ciphertext);
 	
 	return 0;

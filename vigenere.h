@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <future>
 #include "qgr.h"
 
 using namespace std;
@@ -13,7 +15,7 @@ constexpr double min_quadgram_score {-10000000000};
 
 string key_update (string key_for_enc_n_dec, int plaintext_length){
     string temp = "";
-    int i {0};
+    auto i {0};
     while(temp.length()!= plaintext_length) {
         temp = temp + key_for_enc_n_dec[i];
         ++i;
@@ -47,7 +49,7 @@ int decryption(int ciphertext_ascii, int key) {
 string integer_to_char (int ciphertext){
 
     string cipherchar = "";
-    for (int i=0; i<26; ++i) {
+    for (auto i=0; i<26; ++i) {
 
         if(ciphertext == i) {
             cipherchar = int_to_char [i];
@@ -66,7 +68,7 @@ string encrypting (string plaintext, string key) {
 	vector<int> cipher_ascii {};
 
 
-    for(int i=0; i<message_length; ++i) {
+    for(auto i=0; i<message_length; ++i) {
         //Store Credentials as ASCII values
         ascii_value_plaintext.push_back((int)plaintext[i] - 65);
     }
@@ -82,17 +84,17 @@ string encrypting (string plaintext, string key) {
     }
 
     // Converting Key String to ASCII
-    for(int i=0; i<message_length; ++i) {
+    for(auto i=0; i<message_length; ++i) {
         //Store Credentials as ASCII values
         ascii_value_key.push_back((int)key[i] - 65);
     }
 
     //Encrypting Character by Character
-    for(int i=0; i<message_length; ++i) {
+    for(auto i=0; i<message_length; ++i) {
         cipher_ascii.push_back(encryption (ascii_value_plaintext [i], ascii_value_key [i]));
     }
     //Integer to Character Conversion
-    for(int i=0; i<message_length; ++i) {
+    for(auto i=0; i<message_length; ++i) {
         ciphertext = ciphertext + integer_to_char (cipher_ascii[i]);
     }
     
@@ -108,7 +110,7 @@ string decrypting (string ciphertext, string key) {
 	size_t message_length {ciphertext.length()}; 
 	vector<int> plain_ascii {};
 
-    for(int i=0; i<message_length; ++i) {
+    for(auto i=0; i<message_length; ++i) {
         //Store Credentials as ASCII values
         ascii_value_ciphertext.push_back((int)ciphertext[i] - 65);
     }
@@ -123,16 +125,16 @@ string decrypting (string ciphertext, string key) {
     }
 	
 	// Converting Key String to ASCII
-    for(int i=0; i<message_length; ++i) {
+    for(auto i=0; i<message_length; ++i) {
         //Store Credentials as ASCII values
         ascii_value_key.push_back((int)key[i] - 65);
     }
     //Decrypting Character by Character
-    for(int i=0; i<message_length; ++i) {
+    for(auto i=0; i<message_length; ++i) {
         plain_ascii.push_back(decryption (ascii_value_ciphertext [i], ascii_value_key [i]));
     }
     //Integer to Character Conversion
-    for(int i=0; i<message_length; ++i) {
+    for(auto i=0; i<message_length; ++i) {
         plaintext = plaintext + integer_to_char (plain_ascii[i]);
     }   
     
@@ -141,10 +143,10 @@ string decrypting (string ciphertext, string key) {
 
 //Cryptanalysis Functions Below
 double scoring_via_quadgram(string text,int len){
-   int i;
+   	auto i {0};
     char temp[4];
     double score = 0;
-    for (i=0;i<len-3;++i){
+    for (;i<len-3;++i){
         temp[0]=text[i]-'A';
         temp[1]=text[i+1]-'A';
         temp[2]=text[i+2]-'A';
@@ -156,7 +158,7 @@ double scoring_via_quadgram(string text,int len){
 }
 string truncate_key (string key, int key_len) {
 	string truncate_final_key = "";
-	for (int i = 0; i< key_len; ++i) {
+	for (auto i = 0; i< key_len; ++i) {
 			truncate_final_key = truncate_final_key + key [i];
 		}
 	return truncate_final_key;
@@ -206,6 +208,8 @@ public:
 	void read_encrypted() {cin >> encrypted; decrypted=encrypted; length=encrypted.length();}
 	void encrypt(string k) {key=k; encrypted = encrypting(decrypted, key);}
 	void encrypt() {cin >> key; encrypted = encrypting(decrypted, key);}
+	void decrypt(string k) {key=k; decrypted = decrypting(encrypted,key);}
+	void decrypt() {decrypted = decrypting(encrypted,key);}
 	void quadgram_score(size_t l) {score = scoring_via_quadgram(decrypted,l);}
 	void quadgram_score() {score = scoring_via_quadgram(decrypted,length);}
 	void print_status() {
@@ -215,4 +219,25 @@ public:
 };
 
 
+double decryption_key_attempt_score (const VigenereText &ciphertext, const int loc, const int i){
+	string key_copy {ciphertext.key};
+	key_copy[loc] =  int_to_char[i];
+	key_copy = key_update(key_copy, ciphertext.length);
+	return scoring_via_quadgram (decrypting (ciphertext.encrypted, key_copy), ciphertext.length);
+}
+
+
+string decryption_key_attempt (VigenereText &ciphertext, const int loc){
+
+	double decryption_score_list[26];
+	for (auto i = 0; i < 26; ++i) {
+		std::future<double> score = std::async(decryption_key_attempt_score, ciphertext, loc, i);
+		decryption_score_list[i] = score.get();
+	}
+	
+	int best_score_index = std::max_element(std::begin(decryption_score_list), std::end(decryption_score_list)) - std::begin(decryption_score_list);
+	string return_key {ciphertext.key};
+	return_key[loc] =  int_to_char[best_score_index];
+	return return_key;
+}
 
