@@ -19,7 +19,7 @@
 // Ciphertex: TEYAK QDRLP MWRCR AYXQK NRLLL TEYAK QBEZR T  
 //			  TEYAK QDRLP MWRCR AYXQK NRLLL TEYAK QBEZR TMWRC RAYXQ KEETY YRRLA TIARM GTZJU UFRWC RTZPG MMNWJ MLBYC NRVLL POITQ UTZPG MMNWJ EAQLL PAYZL QISPC XLVVC ORLTL S
 
-string text_trim_expand(int encrypted_text_length, string compare_text) {
+string text_trim_expand(const int &encrypted_text_length, const string compare_text) {
 	
 	string return_text = "";
 	auto compare_text_length = compare_text.length();
