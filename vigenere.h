@@ -214,7 +214,7 @@ public:
 	void quadgram_score() {score = scoring_via_quadgram(decrypted,length);}
 	void print_status() {
 		cout << "Score: " << score << '\n';
-		cout << "-----------------------------------\nKEY: " << key << "\nCiphertext: " << decrypted << "\n-----------------------------------\n";
+		cout << "-----------------------------------\nKEY: " << key << "\nPlaintext: " << decrypted << "\n-----------------------------------\n";
 	}
 };
 
