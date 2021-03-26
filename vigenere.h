@@ -5,6 +5,7 @@
 #include <future>
 #include "qgr.h"
 
+
 using namespace std;
 
 extern float qgram[];
@@ -141,9 +142,11 @@ string decrypting (string ciphertext, string key) {
 	return plaintext;
 }
 
+
 //Cryptanalysis Functions Below
 double scoring_via_quadgram(string text,int len){
    	auto i {0};
+
     char temp[4];
     double score = 0;
     for (;i<len-3;++i){
@@ -156,7 +159,7 @@ double scoring_via_quadgram(string text,int len){
     }
     return score;
 }
-string truncate_key (string key, int key_len) {
+string truncate_key (const string key, const int key_len) {
 	string truncate_final_key = "";
 	for (auto i = 0; i< key_len; ++i) {
 			truncate_final_key = truncate_final_key + key [i];
@@ -164,37 +167,6 @@ string truncate_key (string key, int key_len) {
 	return truncate_final_key;
 }
 
-string decryption_key_attempt (string ciphertext, int loc, string key){
-	
-	string plaintext = "", final_key = "", temp_key = "0", truncate_final_key = "", key_copy = key, return_key = "";
-	double decryption_score {min_quadgram_score}, temp_score {min_quadgram_score};
-	int ciphertext_length = ciphertext.length();	
-	for (int i = 0; i < 26; ++i) {
-			
-		//Key Update
-		key[loc] =  int_to_char[i];
-		key = key_update(key, ciphertext.length());	
-			
-		plaintext = decrypting (ciphertext, key);	
-		temp_score = scoring_via_quadgram (plaintext, plaintext.length());
-		if (temp_score > decryption_score) {
-			return_key = key;
-			//cout << " Score: " << temp_score << " Plaintext: " << plaintext << " Potential Key: " << return_key << endl;
-			decryption_score = temp_score;
-		}
-		final_key = key;
-		final_key = truncate_key (key, key_copy.length());
-		key = final_key;
-		truncate_final_key = "";						
-						
-	}
-
-	return_key = truncate_key (return_key, key_copy.length());
-	
-	return return_key;
-}
-
-//Cryptanalysis function above
 
 class VigenereText {
 public:
@@ -225,6 +197,7 @@ double decryption_key_attempt_score (const VigenereText &ciphertext, const int l
 	key_copy = key_update(key_copy, ciphertext.length);
 	return scoring_via_quadgram (decrypting (ciphertext.encrypted, key_copy), ciphertext.length);
 }
+
 
 
 string decryption_key_attempt (VigenereText &ciphertext, const int loc){

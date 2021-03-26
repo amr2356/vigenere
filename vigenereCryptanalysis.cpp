@@ -69,6 +69,7 @@ void vigenere_analysis(VigenereText &ciphertext) {
 		if (key_length > 2*best_key_length) break;
 		
 		//Guessing Keys character by character
+
 		for (auto i = 0; i < key_length; ++i) {
 			ciphertext.key = decryption_key_attempt (ciphertext.encrypted,i,ciphertext.key);
 			ciphertext.decrypted = decrypting (ciphertext.encrypted,ciphertext.key);
