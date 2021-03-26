@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "quadgram_analysis.h"
+#include "qgr.h"
 
 using namespace std;
 
