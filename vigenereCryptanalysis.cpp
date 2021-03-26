@@ -63,14 +63,13 @@ void vigenere_analysis(VigenereText &ciphertext) {
 	
 	size_t best_key_length {ciphertext.length};
 	double highest_score {min_quadgram_score};
-	auto start = chrono::steady_clock::now();
-	for (int key_length = 2; key_length < ciphertext.length; ++key_length) {
+	for (auto key_length = 2; key_length < ciphertext.length; ++key_length) {
 		
 		//Try not to repeat keys
 		if (key_length > 2*best_key_length) break;
 		
 		//Guessing Keys character by character
-		for (int i = 0; i < key_length; ++i) {
+		for (auto i = 0; i < key_length; ++i) {
 			ciphertext.key = decryption_key_attempt (ciphertext.encrypted,i,ciphertext.key);
 			ciphertext.decrypted = decrypting (ciphertext.encrypted,ciphertext.key);
 			ciphertext.quadgram_score();
@@ -83,8 +82,7 @@ void vigenere_analysis(VigenereText &ciphertext) {
 		
 		ciphertext.key = ciphertext.key + int_to_char [0];
 	}
-	auto end = chrono::steady_clock::now();
-	cout << "Elapsed cryptanalysis time : "<< chrono::duration_cast<chrono::seconds>(end - start).count()<< " s";
+	
 }
 
 int main() {
